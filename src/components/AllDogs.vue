@@ -1,95 +1,86 @@
 <template>
   <div>
-    <div class="heroSection">
-      <div>
-        <input
-          @click="isVisible = !isVisible"
-          type="text"
-          name="search"
-          id="search"
-          placeholder="search for dogs"
-          v-model="searchBreed"
-        />
-      </div>
-      <div v-if="isVisible" class="search-result">
-        <div
-          @click="isVisible = !isVisible"
-          v-for="breed in filteredBreed"
-          :key="breed"
-        >
-          <p @click="dogList(breed)">{{ breed }}</p>
+   
+    <div style="margin-top:2rem; color:#2c3e50">
+      <p v-if="isLoading" class="fa fa-spinner">Loading ........</p>
+    </div>
+    <div>
+      <div class="dogs">
+        <div v-for="(dog, index) in this.$store.state.dogList" :key="dog">
+            <img :class="{
+              normal: imageEffect.normal,
+              greyscale: imageEffect.greyscale,
+              sepia: imageEffect.sepia,
+            }" :src="dog" alt="dogs" loading="lazy">
+          <p @click="applyEffect(index)" >Apply Effect</p>
+          <router-link :to="{ name: 'dogInfo', params: { id: index, image: dog } }"  >
+              View More
+          </router-link>
         </div>
-      </div>
-    </div>
-    <div style="margin-left: 3rem">
-      <h1>Hey Dog Lovers</h1>
-      <p>Check Out Some of Our amazing breeds of Dogs</p>
-    </div>
-    <div class="dogs">
-      <div
-        style="position: relative"
-        v-for="(dog, index) in dogList"
-        :key="index"
-      >
-        <img
-          :class="{
-            normal: imageEffect.normal,
-            greyscale: imageEffect.greyscale,
-            sepia: imageEffect.sepia,
-          }"
-          :src="dog"
-          alt="dogs"
-          loading="lazy"
-        />
-        <p @click="applyEffect(index)" class="effect" >Apply Effect</p>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-import { baseUrl } from "@/config";
-import { mapState } from "vuex";
-import axios from "axios";
-export default {
-  name: "AllDogs",
 
+<script>
+import axios from 'axios';
+import { baseUrl } from '../config';
+const url = baseUrl;
+
+import { mapState } from "vuex";
+export default {
+  props: ["breedName"],
   data() {
     return {
-      dogList: [],
-      count: 0,
+      isLoading: false,
+       count: 0,
       dogIndex: 0,
       imageEffect: {
         normal: true,
         greyscale: false,
         sepia: false,
       },
-    };
+    }
   },
 
   mounted() {
-    this.getAllDog();
+    this.dogList();
+    var dogList = JSON.parse(localStorage.getItem("dogList"));
+    this.$store.dispatch("dogList", dogList);
+    // this.$store.dispatch("breedName", this.allBreeds[0]);
+    console.log(this.allBreeds)
   },
 
   computed: {
-    ...mapState["dogList"],
+    ...mapState(["allBreeds"]),
+
   },
 
   methods: {
-    async getAllDog() {
-      try {
-        const response = await axios.get(`${baseUrl}/breed/bulldog/images`);
-        this.dogList = response.data.message.slice(0, 99);
-
-        console.log(this.dogList);
-      } catch (error) {
-        console.log(error);
-      }
+    dogList() {
+      this.isLoading = true;
+      axios({
+        method: "GET",
+        url: `${url}/breed/bulldog/images`,
+        headers: {
+          'Content-type': 'application/json'
+        }
+      })
+        .then((res) => {
+          let dog = res.data.message;
+          let dogArray = dog.slice(0, 99);
+          localStorage.setItem("dogList", JSON.stringify(dogArray));
+          this.isLoading = false;
+        })
+        .catch((err) => {
+          console.log(err);
+        })
     },
 
     applyEffect(index) {
       this.dogIndex = index;
-      if(this.dogIndex === index && this.count <= 2) {
+      if (this.dogIndex === index && this.count <= 2) {
         this.count++;
         console.log(this.count);
 
@@ -115,9 +106,11 @@ export default {
         this.imageEffect.greyscale = false;
       }
     },
-  },
-};
+  }
+}
 </script>
+
+
 
 <!--  "scoped" limits CSS to this component only -->
 <style scoped>
@@ -169,4 +162,6 @@ img {
   border-radius: 0.5rem;
   color: white;
 }
+
+
 </style>

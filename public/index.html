@@ -15,13 +15,4 @@
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>
-  <script>
-    const indexedDB = windows.indexedDB;
-    const request = indexedDB.open("DogDB", 1);
-    request.onerror = function (event) {
-      console.error("An error occured");
-      console.error(event);
-    };
-
-  </script>
 </html>
