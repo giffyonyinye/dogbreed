@@ -11,7 +11,17 @@
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
+    
     <div id="app"></div>
     <!-- built files will be auto injected -->
   </body>
+  <script>
+    const indexedDB = windows.indexedDB;
+    const request = indexedDB.open("DogDB", 1);
+    request.onerror = function (event) {
+      console.error("An error occured");
+      console.error(event);
+    };
+
+  </script>
 </html>
