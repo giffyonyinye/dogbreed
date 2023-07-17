@@ -44,7 +44,7 @@
             alt="dogs"
             loading="lazy"
           />
-          <p style="cursor: pointer" @click="applyNextFilter(index)">
+          <p style="cursor: pointer; " @click="applyNextFilter(index)">
             Apply Effect
           </p>
           <router-link
@@ -68,7 +68,7 @@ export default {
     return {
       searchBreed: "",
       isVisible: false,
-      breedName: this.$route.params.breed,
+      breedName: "",
       showSearchResult: false,
       dogLists: true,
       showBreedList: false,
@@ -88,9 +88,8 @@ export default {
 
   mounted() {
     this.getAllBreeds();
-    this.dogList();
-    this.breedName = this.$route.params.breed
-    console.log(this.breedName)
+    this.breedName = localStorage.getItem("breed");
+    console.log(this.breedName);
   },
 
   methods: {
@@ -108,15 +107,13 @@ export default {
       });
     },
 
+
     dogList(breed) {
-        console.log(breed);
-      this.$store.dispatch("breedName", breed);
-      localStorage.setItem("breed", breed);
       this.isLoading = true;
-      const breedName = localStorage.getItem("breed");
+      console.log(this.breedName)
       axios({
         method: "GET",
-        url: `${url}/breed/${breedName ==- undefined ? this.breedName : breedName}/images`,
+        url: `${url}/breed/${ this.breedName }/images`,
         headers: {
           "Content-type": "application/json",
         },
@@ -194,6 +191,7 @@ input {
   justify-content: center;
   margin: 4rem 4rem;
   gap: 2rem;
+  position: relative;
 }
 
 img {

@@ -8,10 +8,12 @@
       <div class="dogs">
         <div v-for="(dog, index) in this.$store.state.dogList" :key="dog">
             <img :class="getFilterClass(index)" :src="dog" alt="dogs" loading="lazy">
-          <p @click="applyNextFilter(index)" >Apply Effect</p>
-          <router-link :to="{ name: 'dogInfo', params: { id: index, image: dog } }"  >
-              View More
-          </router-link>
+            <div >
+              <p style="cursor: pointer;" @click="applyNextFilter(index)" >Apply Effect</p>
+              <router-link  :to="{ name: 'dogInfo', params: { id: index, image: dog } }"  >
+                  View More
+                </router-link>
+            </div>
         </div>
       </div>
     </div>
@@ -47,8 +49,7 @@ export default {
     this.dogList();
     var dogList = JSON.parse(localStorage.getItem("dogList"));
     this.$store.dispatch("dogList", dogList);
-    // this.$store.dispatch("breedName", this.allBreeds[0]);
-    console.log(this.allBreeds)
+    this.$store.dispatch("breedName", this.allBreeds[0]);
   },
 
   computed: {
@@ -125,6 +126,7 @@ input {
   justify-content: center;
   margin: 4rem 4rem;
   gap: 2rem;
+  position: relative;
 }
 
 img {

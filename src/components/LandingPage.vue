@@ -55,7 +55,6 @@ export default {
 
   mounted() {
     this.getAllBreeds();
-    // this.dogList();
   },
 
   computed: {
@@ -88,25 +87,29 @@ export default {
 
     dogList(breed) {
       this.$store.dispatch("breedName", breed);
-      this.isLoading = true;
-      axios({
-        method: "GET",
-        url: `${url}/breed/${breed}/images`,
-        headers: {
-          "Content-type": "application/json",
-        },
-      })
-        .then((res) => {
-          let searchResult = res.data.message;
-          this.dogLists = false;
-          this.showSearchResult = true;
-          this.$store.dispatch("searchResult", searchResult);
-          this.isLoading = false;
+    localStorage.setItem("breed", breed);
           this.$router.push(`breed/${breed}`);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+
+    // console.log(breed);
+    //   this.isLoading = true;
+    //   axios({
+    //     method: "GET",
+    //     url: `${url}/breed/${breed}/images`,
+    //     headers: {
+    //       "Content-type": "application/json",
+    //     },
+    //   })
+    //     .then((res) => {
+    //       let searchResult = res.data.message;
+    //       this.dogLists = false;
+    //       this.showSearchResult = true;
+    //       this.$store.dispatch("searchResult", searchResult);
+    //       this.isLoading = false;
+    //       this.$router.push(`breed/${breed}`);
+    //     })
+    //     .catch((error) => {
+    //       console.log(error);
+    //     });
     },
 
     
