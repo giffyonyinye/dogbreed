@@ -1,52 +1,59 @@
 <template>
   <div class="main">
     <!-- THIS IS THE SEARCH BAR AND ITS FUNCTIONALITY -->
-      <div style="padding: 2rem 2rem 2rem 3rem; background: #2c3e50; color: white;">
-          <h1>Hey Dog Lovers</h1>
-          <p>Check Out Some of Our amazing breeds of Dogs</p>
+    <div
+      style="padding: 2rem 2rem 2rem 3rem; background: #2c3e50; color: white"
+    >
+      <h1>Hey Dog Lovers</h1>
+      <p>Check Out Some of Our amazing breeds of Dogs</p>
+    </div>
+    <!-- THIS IS THE SEARCH BAR AND ITS FUNCTIONALITY -->
+    <div class="header">
+      <div>
+        <input
+          @click="isVisible = !isVisible"
+          type="text"
+          name="search"
+          id="search"
+          placeholder="search for dogs"
+          v-model="searchBreed"
+        />
+      </div>
+      <div v-if="isVisible" class="search-result">
+        <div
+          @click="isVisible = !isVisible"
+          v-for="breed in filteredBreed"
+          :key="breed"
+        >
+          <p style="cursor: pointer" @click="dogList(breed)">{{ breed }}</p>
         </div>
-        <!-- THIS IS THE SEARCH BAR AND ITS FUNCTIONALITY -->
-        <div class="header">
-          <div>
-            <input
-              @click="isVisible = !isVisible"
-              type="text"
-              name="search"
-              id="search"
-              placeholder="search for dogs"
-              v-model="searchBreed"
-            />
-          </div>
-          <div v-if="isVisible" class="search-result">
-            <div
-              @click="isVisible = !isVisible"
-              v-for="breed in filteredBreed"
-              :key="breed"
-            >
-              <p style="cursor: pointer" @click="dogList(breed)">{{ breed }}</p>
-            </div>
-          </div>
-        </div>
+      </div>
+    </div>
 
     <!-- THIS SHOWS THE SEARCH RESULTS OF ANY BREED SEARCHED FOR -->
     <div v-show="showSearchResult">
-      <div style="margin-top: 2rem; color: #2c3e50; text-align: center;">
+      <div style="margin-top: 2rem; color: #2c3e50; text-align: center">
         <i v-if="isLoading" class="fa fa-spinner">Loading ........</i>
       </div>
 
       <div class="dogs">
-            <div v-for="(dog, index) in searchResult " :key="dog">
-                <img :class="{
-                    normal: imageEffect.normal,
-                    greyscale: imageEffect.greyscale,
-                    sepia: imageEffect.sepia,
-                }" :src="dog" alt="dogs" loading="lazy">
-              <p @click="applyEffect(index)" >Apply Effect</p>
-              <router-link :to="{ name: 'dogInfo', params: { id: index, image: dog } }"  >
-                  View More
-              </router-link>
-            </div>
-          </div>
+        <div v-for="(dog, index) in searchResult" :key="dog">
+          <img
+            :class="getFilterClass(index)"
+            :src="dog"
+            alt="dogs"
+            loading="lazy"
+          />
+          <p style="cursor: pointer" @click="applyNextFilter(index)">
+            Apply Effect
+          </p>
+          <router-link
+            :to="{ name: 'dogInfo', params: { id: index, image: dog } }"
+          >
+            View More
+          </router-link>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -65,32 +72,21 @@ export default {
       dogLists: true,
       showBreedList: false,
       isLoading: false,
-    count: 0,
-    dogIndex: 0,
-    imageEffect: {
-        normal: true,
-        greyscale: false,
+      count: 0,
+      currentFilterIndex: 0,
+      dogIndex: 0,
+      imageEffect: {
         sepia: false,
-    },
+        grayscale: false,
+        normal: true,
+      },
+      filterOptions: ["sepia", "grayscale", "normal"],
     };
   },
 
   mounted() {
     this.getAllBreeds();
     this.dogList();
-  },
-
-  computed: {
-    ...mapState(["allBreeds", "searchResult"]),
-    filteredBreed() {
-      if (this.searchBreed) {
-        return this.allBreeds.filter((breed) => {
-          return breed.toLowerCase().includes(this.searchBreed.toLowerCase());
-        });
-      } else {
-        return this.allBreeds;
-      }
-    },
   },
 
   methods: {
@@ -107,7 +103,6 @@ export default {
         this.$store.dispatch("allBreeds", breeds);
       });
     },
-
 
     dogList(breed) {
       this.$store.dispatch("breedName", breed);
@@ -132,97 +127,110 @@ export default {
         });
     },
 
-      applyEffect(index) {
-            this.dogIndex = index;
-            if (this.dogIndex === index && this.count <= 2) {
-                this.count++;
-                console.log(this.count);
+    applyNextFilter(index) {
+      this.count = index;
+      if (this.count == index) {
+        const nextFilterIndex =
+          (this.currentFilterIndex + 1) % this.filterOptions.length;
+        const nextFilter = this.filterOptions[nextFilterIndex];
 
-            }
-            // if (this.count <= 2) {
-            // }
-            if (this.count === 0) {
-                console.log("count is 0");
-                this.imageEffect.greyscale = true;
-            }
-            if (this.count === 1) {
-                console.log("count is 1");
-                this.imageEffect.greyscale = true;
-            }
-            if (this.count === 2) {
-                console.log("count is 2");
-                this.imageEffect.sepia = true;
-            }
-            if (this.count == 3) {
-                console.log("count is 3");
-                this.count = 0;
-                this.imageEffect.sepia = false;
-                this.imageEffect.greyscale = false;
-            }
-        },
+        // Reset all filters to false
+        Object.keys(this.imageEffect).forEach((filter) => {
+          this.imageEffect[filter] = false;
+        });
+
+        // Apply the next filter
+        this.imageEffect[nextFilter] = true;
+
+        this.currentFilterIndex = nextFilterIndex;
+      }
+    },
+
+    getFilterClass(index) {
+      if (this.count === index) {
+        const activeFilters = Object.keys(this.imageEffect).filter(
+          (filter) => this.imageEffect[filter]
+        );
+        return activeFilters.map((filter) => `${filter}-filter`).join(" ");
+      }
+    },
+  },
+
+  computed: {
+    ...mapState(["allBreeds", "searchResult"]),
+
+    filteredBreed() {
+      if (this.searchBreed) {
+        return this.allBreeds.filter((breed) => {
+          return breed.toLowerCase().includes(this.searchBreed.toLowerCase());
+        });
+      } else {
+        return this.allBreeds;
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
 input {
-    width: 50%;
-    outline: none;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    border: none;
+  width: 50%;
+  outline: none;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: none;
 }
 
 .dogs {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: 4rem 4rem;
-    gap: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 4rem 4rem;
+  gap: 2rem;
 }
 
 img {
-    width: 18rem;
-    height: 18rem;
-    border-radius: 0.3rem;
-    object-fit: cover;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 0.3rem;
+  object-fit: cover;
 }
 
-.greyscale {
-    filter: grayscale(100);
+.grayscale-filter {
+  filter: grayscale(100);
 }
 
-.sepia {
-    filter: sepia(100);
+.sepia-filter {
+  filter: sepia(100);
 }
 
-.heroSection {
-    height: 10rem;
-    background-color: rgb(236, 217, 236);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.heroSection-filter {
+  height: 10rem;
+  background-color: rgb(236, 217, 236);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .effect {
-    position: absolute;
-    right: 0.4rem;
-    bottom: 0.5rem;
-    background-color: brown;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    color: white;
+  position: absolute;
+  right: 0.4rem;
+  bottom: 0.5rem;
+  background-color: brown;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  color: white;
 }
 
 .dog-list {
-    width:100%;
-    display:flex;
-    flex-flow: row nowrap;
-    border: 1px solid black;
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  border: 1px solid black;
 }
-.main{
-    background: white;
+.main {
+  background: white;
 }
 .header {
   background: whitesmoke;
@@ -230,7 +238,6 @@ img {
   display: flex;
   justify-content: end;
   position: relative;
-
 }
 
 .header input {
@@ -259,6 +266,6 @@ img {
 }
 
 .list {
-    cursor: pointer;
+  cursor: pointer;
 }
 </style>
