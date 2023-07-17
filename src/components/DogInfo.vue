@@ -1,7 +1,7 @@
 <template>
 <!-- THIS SHOWS DOG INFORMATION -->
   <div class="dog-info">
-    <img :src="breedImage" alt="dog">
+    <img style="object-fit: cover;" :src="breedImage" alt="dog">
     <p>{{this.$store.state.breedName}}</p>
   </div>
 </template>
