@@ -1,7 +1,7 @@
 <template>
   <div class="main">
-    <div style="padding: 2rem 2rem 2rem 3rem; background: #2c3e50; color: white;">
-      <h1>Hey Dog Lovers</h1>
+    <div style="padding: 1rem 2rem 1rem 3rem; background: #2c3e50; color: white;">
+      <h1>Dogs</h1>
       <p>Check Out Some of Our amazing breeds of Dogs</p>
     </div>
     <!-- THIS IS THE SEARCH BAR AND ITS FUNCTIONALITY -->
@@ -108,6 +108,8 @@ export default {
           console.log(error);
         });
     },
+
+    
   },
 };
 </script>

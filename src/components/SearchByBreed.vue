@@ -68,6 +68,7 @@ export default {
     return {
       searchBreed: "",
       isVisible: false,
+      breedName: this.$route.params.breed,
       showSearchResult: false,
       dogLists: true,
       showBreedList: false,
@@ -79,14 +80,17 @@ export default {
         sepia: false,
         grayscale: false,
         normal: true,
+        cartoonify: false
       },
-      filterOptions: ["sepia", "grayscale", "normal"],
+      filterOptions: ["sepia", "grayscale", "normal", "cartoonify"],
     };
   },
 
   mounted() {
     this.getAllBreeds();
     this.dogList();
+    this.breedName = this.$route.params.breed
+    console.log(this.breedName)
   },
 
   methods: {
@@ -105,11 +109,14 @@ export default {
     },
 
     dogList(breed) {
+        console.log(breed);
       this.$store.dispatch("breedName", breed);
+      localStorage.setItem("breed", breed);
       this.isLoading = true;
+      const breedName = localStorage.getItem("breed");
       axios({
         method: "GET",
-        url: `${url}/breed/${breed}/images`,
+        url: `${url}/breed/${breedName ==- undefined ? this.breedName : breedName}/images`,
         headers: {
           "Content-type": "application/json",
         },
@@ -203,7 +210,30 @@ img {
 .sepia-filter {
   filter: sepia(100);
 }
+.cartoonify-filter {
+  animation-name: imageAnimation;
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
 
+@keyframes imageAnimation {
+ 0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(5deg) scale(0.95);
+  }
+  50% {
+    transform: rotate(-5deg) scale(1.05);
+  }
+  75% {
+    transform: rotate(5deg) scale(0.95);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
 .heroSection-filter {
   height: 10rem;
   background-color: rgb(236, 217, 236);

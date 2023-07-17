@@ -7,12 +7,8 @@
     <div>
       <div class="dogs">
         <div v-for="(dog, index) in this.$store.state.dogList" :key="dog">
-            <img :class="{
-              normal: imageEffect.normal,
-              greyscale: imageEffect.greyscale,
-              sepia: imageEffect.sepia,
-            }" :src="dog" alt="dogs" loading="lazy">
-          <p @click="applyEffect(index)" >Apply Effect</p>
+            <img :class="getFilterClass(index)" :src="dog" alt="dogs" loading="lazy">
+          <p @click="applyNextFilter(index)" >Apply Effect</p>
           <router-link :to="{ name: 'dogInfo', params: { id: index, image: dog } }"  >
               View More
           </router-link>
@@ -36,11 +32,14 @@ export default {
       isLoading: false,
        count: 0,
       dogIndex: 0,
+      currentFilterIndex: 0,
       imageEffect: {
-        normal: true,
-        greyscale: false,
         sepia: false,
+        grayscale: false,
+        normal: true,
+        cartoonify: false
       },
+      filterOptions: ["sepia", "grayscale", "normal", "cartoonify"],
     }
   },
 
@@ -78,32 +77,31 @@ export default {
         })
     },
 
-    applyEffect(index) {
-      this.dogIndex = index;
-      if (this.dogIndex === index && this.count <= 2) {
-        this.count++;
-        console.log(this.count);
+    applyNextFilter(index) {
+      this.count = index;
+      if (this.count == index) {
+        const nextFilterIndex =
+          (this.currentFilterIndex + 1) % this.filterOptions.length;
+        const nextFilter = this.filterOptions[nextFilterIndex];
 
+        // Reset all filters to false
+        Object.keys(this.imageEffect).forEach((filter) => {
+          this.imageEffect[filter] = false;
+        });
+
+        // Apply the next filter
+        this.imageEffect[nextFilter] = true;
+
+        this.currentFilterIndex = nextFilterIndex;
       }
-      // if (this.count <= 2) {
-      // }
-      if (this.count === 0) {
-        console.log("count is 0");
-        this.imageEffect.greyscale = true;
-      }
-      if (this.count === 1) {
-        console.log("count is 1");
-        this.imageEffect.greyscale = true;
-      }
-      if (this.count === 2) {
-        console.log("count is 2");
-        this.imageEffect.sepia = true;
-      }
-      if (this.count == 3) {
-        console.log("count is 3");
-        this.count = 0;
-        this.imageEffect.sepia = false;
-        this.imageEffect.greyscale = false;
+    },
+
+    getFilterClass(index) {
+      if (this.count === index) {
+        const activeFilters = Object.keys(this.imageEffect).filter(
+          (filter) => this.imageEffect[filter]
+        );
+        return activeFilters.map((filter) => `${filter}-filter`).join(" ");
       }
     },
   }
@@ -136,12 +134,36 @@ img {
   object-fit: cover;
 }
 
-.greyscale {
+.grayscale-filter {
   filter: grayscale(100);
 }
 
-.sepia {
+.sepia-filter {
   filter: sepia(100);
+}
+.cartoonify-filter {
+  animation-name: imageAnimation;
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes imageAnimation {
+ 0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(5deg) scale(0.95);
+  }
+  50% {
+    transform: rotate(-5deg) scale(1.05);
+  }
+  75% {
+    transform: rotate(5deg) scale(0.95);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
 }
 
 .heroSection {
