@@ -38,13 +38,15 @@
 
       <div class="dogs">
         <div v-for="(dog, index) in searchResult" :key="dog">
-          <img
-          style="position: relative"
-            :class="getFilterClass(index)"
-            :src="dog"
-            alt="dogs"
-            loading="lazy"
-          />
+            <router-link :to="{ name: 'dogInfo', params: { id: index, image: dog } }">
+                <img
+                style="position: relative"
+                  :class="getFilterClass(index)"
+                  :src="dog"
+                  alt="dogs"
+                  loading="lazy"
+                />
+            </router-link>
           <div class="effect">
                 <p
                   style="

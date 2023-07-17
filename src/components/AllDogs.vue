@@ -10,20 +10,24 @@
           v-for="(dog, index) in this.$store.state.dogList"
           :key="dog"
         >
-          <img
-            :class="getFilterClass(index)"
-            :src="dog"
-            alt="dogs"
-            loading="lazy"
-          />
-          <div class="effect" >
+          <router-link
+            :to="{ name: 'dogInfo', params: { id: index, image: dog } }"
+          >
+            <img
+              :class="getFilterClass(index)"
+              :src="dog"
+              alt="dogs"
+              loading="lazy"
+            />
+          </router-link>
+          <div class="effect">
             <p
               style="
                 cursor: pointer;
                 font-size: 0.8rem;
                 background-color: white;
                 color: black;
-                padding: .5rem;
+                padding: 0.5rem;
               "
               @click="applyNextFilter(index)"
             >
@@ -36,7 +40,7 @@
                   color: white;
                   border: 1px solid;
                   font-size: 0.8rem;
-                padding: .5rem;
+                  padding: 0.5rem;
                 "
                 :to="{ name: 'dogInfo', params: { id: index, image: dog } }"
               >
