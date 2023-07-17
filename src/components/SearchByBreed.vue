@@ -39,19 +39,40 @@
       <div class="dogs">
         <div v-for="(dog, index) in searchResult" :key="dog">
           <img
+          style="position: relative"
             :class="getFilterClass(index)"
             :src="dog"
             alt="dogs"
             loading="lazy"
           />
-          <p style="cursor: pointer; " @click="applyNextFilter(index)">
-            Apply Effect
-          </p>
-          <router-link
-            :to="{ name: 'dogInfo', params: { id: index, image: dog } }"
-          >
-            View More
-          </router-link>
+          <div class="effect">
+                <p
+                  style="
+                cursor: pointer;
+                font-size: 0.8rem;
+                background-color: white;
+                color: black;
+                padding: .5rem;
+              "
+                  @click="applyNextFilter(index)"
+                >
+                  Apply Effect
+                </p>
+                <div style="margin-top: 1rem">
+                  <router-link
+                    style="
+                  text-decoration: none;
+                  color: white;
+                  border: 1px solid;
+                  font-size: 0.8rem;
+                  padding: .5rem;
+                "
+                    :to="{ name: 'dogInfo', params: { id: index, image: dog } }"
+                  >
+                    View More
+                  </router-link>
+                </div>
+              </div>    
         </div>
       </div>
     </div>
@@ -90,6 +111,8 @@ export default {
     this.getAllBreeds();
     this.breedName = localStorage.getItem("breed");
     console.log(this.breedName);
+    this.dogList();
+
   },
 
   methods: {
@@ -113,7 +136,7 @@ export default {
       console.log(this.breedName)
       axios({
         method: "GET",
-        url: `${url}/breed/${ this.breedName }/images`,
+        url: `${url}/breed/${ breed ? breed : this.breedName }/images`,
         headers: {
           "Content-type": "application/json",
         },
@@ -232,34 +255,22 @@ img {
     transform: rotate(0deg) scale(1);
   }
 }
-.heroSection-filter {
-  height: 10rem;
-  background-color: rgb(236, 217, 236);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
 .effect {
-  position: absolute;
+  /* position: absolute; */
   right: 0.4rem;
   bottom: 0.5rem;
-  background-color: brown;
+  background-color: #2c3e50;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0 1rem 0 1rem;
   border-radius: 0.5rem;
   color: white;
+  display: flex;
+  justify-content: space-between;
+  gap: 4rem;
+  left: 1rem;
 }
 
-.dog-list {
-  width: 100%;
-  display: flex;
-  flex-flow: row nowrap;
-  border: 1px solid black;
-}
-.main {
-  background: white;
-}
 .header {
   background: whitesmoke;
   padding: 2rem;
@@ -293,7 +304,4 @@ img {
   top: 5.2rem;
 }
 
-.list {
-  cursor: pointer;
-}
 </style>

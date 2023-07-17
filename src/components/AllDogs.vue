@@ -1,29 +1,58 @@
 <template>
   <div>
-   
-    <div style="margin-top:2rem; color:#2c3e50">
+    <div style="margin-top: 2rem; color: #2c3e50">
       <p v-if="isLoading" class="fa fa-spinner">Loading ........</p>
     </div>
     <div>
       <div class="dogs">
-        <div v-for="(dog, index) in this.$store.state.dogList" :key="dog">
-            <img :class="getFilterClass(index)" :src="dog" alt="dogs" loading="lazy">
-            <div >
-              <p style="cursor: pointer;" @click="applyNextFilter(index)" >Apply Effect</p>
-              <router-link  :to="{ name: 'dogInfo', params: { id: index, image: dog } }"  >
-                  View More
-                </router-link>
+        <div
+          style="position: relative"
+          v-for="(dog, index) in this.$store.state.dogList"
+          :key="dog"
+        >
+          <img
+            :class="getFilterClass(index)"
+            :src="dog"
+            alt="dogs"
+            loading="lazy"
+          />
+          <div class="effect" >
+            <p
+              style="
+                cursor: pointer;
+                font-size: 0.8rem;
+                background-color: white;
+                color: black;
+                padding: .5rem;
+              "
+              @click="applyNextFilter(index)"
+            >
+              Apply Effect
+            </p>
+            <div style="margin-top: 1rem">
+              <router-link
+                style="
+                  text-decoration: none;
+                  color: white;
+                  border: 1px solid;
+                  font-size: 0.8rem;
+                padding: .5rem;
+                "
+                :to="{ name: 'dogInfo', params: { id: index, image: dog } }"
+              >
+                View More
+              </router-link>
             </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-
 <script>
-import axios from 'axios';
-import { baseUrl } from '../config';
+import axios from "axios";
+import { baseUrl } from "../config";
 const url = baseUrl;
 
 import { mapState } from "vuex";
@@ -32,17 +61,17 @@ export default {
   data() {
     return {
       isLoading: false,
-       count: 0,
+      count: 0,
       dogIndex: 0,
       currentFilterIndex: 0,
       imageEffect: {
         sepia: false,
         grayscale: false,
         normal: true,
-        cartoonify: false
+        cartoonify: false,
       },
       filterOptions: ["sepia", "grayscale", "normal", "cartoonify"],
-    }
+    };
   },
 
   mounted() {
@@ -54,7 +83,6 @@ export default {
 
   computed: {
     ...mapState(["allBreeds"]),
-
   },
 
   methods: {
@@ -64,8 +92,8 @@ export default {
         method: "GET",
         url: `${url}/breed/bulldog/images`,
         headers: {
-          'Content-type': 'application/json'
-        }
+          "Content-type": "application/json",
+        },
       })
         .then((res) => {
           let dog = res.data.message;
@@ -75,7 +103,7 @@ export default {
         })
         .catch((err) => {
           console.log(err);
-        })
+        });
     },
 
     applyNextFilter(index) {
@@ -105,11 +133,9 @@ export default {
         return activeFilters.map((filter) => `${filter}-filter`).join(" ");
       }
     },
-  }
-}
+  },
+};
 </script>
-
-
 
 <!--  "scoped" limits CSS to this component only -->
 <style scoped>
@@ -151,7 +177,7 @@ img {
 }
 
 @keyframes imageAnimation {
- 0% {
+  0% {
     transform: rotate(0deg) scale(1);
   }
   25% {
@@ -177,15 +203,17 @@ img {
 }
 
 .effect {
-  position: absolute;
+  /* position: absolute; */
   right: 0.4rem;
   bottom: 0.5rem;
-  background-color: brown;
+  background-color: #2c3e50;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0 1rem 0 1rem;
   border-radius: 0.5rem;
   color: white;
+  display: flex;
+  justify-content: space-between;
+  gap: 4rem;
+  left: 1rem;
 }
-
-
 </style>
